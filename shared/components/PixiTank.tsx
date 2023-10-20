@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react"
 import * as PIXI from 'pixi.js'
 import { pictureLoader } from "@/shared/helpers/pictureLoader"
+import { Tank } from '@/shared/helpers/Tank'
 
 const PixiTank = () => {
     const ref = useRef<HTMLDivElement>(null)
@@ -31,12 +32,19 @@ const PixiTank = () => {
 
         async function makeTankSprites() {
 
-            const loadFieldAssets = await PIXI.Assets.loadBundle('tank')
-            const trackСFrame1 = new PIXI.Sprite(loadFieldAssets.trackСFrame1)
-            trackСFrame1.anchor.set(0.5)
-            trackСFrame1.width = 80
-            trackСFrame1.height = 80
-            container.addChild(trackСFrame1 as PIXI.DisplayObject)
+            const loadAssets = await PIXI.Assets.loadBundle('tank')
+            const tank = new Tank(loadAssets) 
+            tank._tracksLeft.play()
+            tank._tracksRight.play()
+
+            container.addChild(tank.view)
+
+            // const trackСFrame1 = new PIXI.Sprite(loadFieldAssets.trackСFrame1)
+            // trackСFrame1.anchor.set(0.5)
+            // trackСFrame1.width = 80
+            // trackСFrame1.height = 80
+            // container.addChild(trackСFrame1 as PIXI.DisplayObject)
+
         }
 
         async function tankAnimation () {
