@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react"
 import * as PIXI from 'pixi.js'
 import { pictureLoader } from "@/shared/helpers/pictureLoader"
 import { Tank } from '@/shared/helpers/Tank'
+import { moveTank } from "@/shared/helpers/moveTank"
 
 const PixiTank = () => {
     const ref = useRef<HTMLDivElement>(null)
@@ -14,15 +15,12 @@ const PixiTank = () => {
 
         })
 
-        globalThis.__PIXI_APP__ = app;   // для тестирования в браузере 
+        // globalThis.__PIXI_APP__ = app;   // для тестирования в браузере 
 
         ref.current?.appendChild(app.view)
         app.start()
 
-        // Создание контейнера и добавление на сцену
-        const container = new PIXI.Container()
-        app.stage.addChild(container as PIXI.DisplayObject)
-
+        app.stage.position.set(600 / 2, 600 / 2);
 
         async function initLoading() {
       
@@ -34,16 +32,14 @@ const PixiTank = () => {
 
             const loadAssets = await PIXI.Assets.loadBundle('tank')
             const tank = new Tank(loadAssets) 
-            tank._tracksLeft.play()
-            tank._tracksRight.play()
 
-            container.addChild(tank.view)
+            app.stage.addChild(tank.view)
+            tank.view.scale.set(0.5)
 
-            // const trackСFrame1 = new PIXI.Sprite(loadFieldAssets.trackСFrame1)
-            // trackСFrame1.anchor.set(0.5)
-            // trackСFrame1.width = 80
-            // trackСFrame1.height = 80
-            // container.addChild(trackСFrame1 as PIXI.DisplayObject)
+            app.stage.on('pointerdown', (e) => moveTank(e, app, tank))
+            app.stage.interactive = true
+            app.stage.interactiveChildren = false
+            app.stage.hitArea = new PIXI.Rectangle(-300, -300, 600, 600)
 
         }
 
@@ -54,8 +50,6 @@ const PixiTank = () => {
 
         tankAnimation()
 
-        container.x = app.screen.width / 2
-        container.y = app.screen.height / 2
 
         return () => {
             // При выгрузке компоненты приложение pixi и все объекты удаляются
